@@ -14,12 +14,7 @@ class CartsTableSeeder extends Seeder
      */
     public function run(): void
     {
-        $customers = User::where('role', 'customer')->get();
-
-        foreach ($customers as $customer) {
-            Cart::factory()->create([
-                'customer_id' => $customer->id
-            ]);
+       Cart::factory()->count(10)->create(); 
     }
 }
-}
+

@@ -16,15 +16,8 @@ class PaymentsTableSeeder extends Seeder
      */
     public function run(): void
     {
-         $orders = Order::all();
-
-        foreach ($orders as $order) {
-            Payment::factory()->create([
-                'order_id' => $order->id,
-                'amount' => $order->total_amount,
-                'method' => ['credit_card','paypal','cash_on_delivery'][rand(0,2)],
-                'status' => ['pending','paid','failed'][rand(0,2)]
-            ]);
+         Payment::factory(10)->create();
+        
         }
     }
-}
+

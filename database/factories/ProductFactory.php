@@ -19,14 +19,14 @@ class ProductFactory extends Factory
     {
         return [
              
-        'vendor_id' => User::where('role','vendor')->inRandomOrder()->first()->id ?? 1,
-        'name' => $this->faker->word,
-        'description' => $this->faker->sentence,
-        'price' => $this->faker->randomFloat(2, 10, 500),
-        'stock' => $this->faker->numberBetween(1,100),
-        'image_url' => $this->faker->imageUrl(400,300,'product',true),
-        'status' => 'active',
-    ];
+        'vendor_id' => User::factory()->state(['role' => 'vendor']),
+            'name' => $this->faker->word(),
+            'description' => $this->faker->sentence(),
+            'price' => $this->faker->randomFloat(2, 5, 500),
+            'stock' => $this->faker->numberBetween(0, 100),
+            'image_url' => $this->faker->imageUrl(),
+            'status' => $this->faker->randomElement(['active','inactive']),
+        ];
         
     }
 }

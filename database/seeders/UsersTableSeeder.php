@@ -14,14 +14,14 @@ class UsersTableSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory()->create([
-            'name' => 'Admin',
-            'email' => 'admin@example.com',
-            'role' => 'admin',
-            'password' => bcrypt('password'),
-            'phone'=>'77777777777',
-            'address'=>'tiaz'
-        ]);
+        // User::factory()->create([
+        //     'name' => 'Admin',
+        //     'email' => 'admin@example.com',
+        //     'role' => 'admin',
+        //     'password' => bcrypt('password'),
+        //     'phone'=>'77777777777',
+        //     'address'=>'tiaz'
+        // ]);
          User::factory()->count(2)->create(['role' => 'vendor']);
 
           User::factory()->count(2)->create(['role' => 'customer']);

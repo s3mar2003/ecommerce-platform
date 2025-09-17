@@ -15,18 +15,8 @@ class CartItemsTableSeeder extends Seeder
      */
     public function run(): void
     {
-        $carts = Cart::all();
-        $products = Product::all();
+        CartItem::factory()->count(30)->create();
+       
+}
+}
 
-        foreach ($carts as $cart) {
-            $randomProducts = $products->random(3); // 3 منتجات لكل سلة
-            foreach ($randomProducts as $product) {
-                CartItem::factory()->create([
-                    'cart_id' => $cart->id,
-                    'product_id' => $product->id,
-                    'quantity' => rand(1,3)
-                ]);
-    }
-}
-    }
-}
