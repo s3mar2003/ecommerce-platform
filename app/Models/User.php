@@ -21,7 +21,33 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'phone',
+        'address',
+        
     ];
+// Vendor
+    public function products()
+{
+    return $this->hasMany(Product::class, 'vendor_id');
+}
+
+//Customer
+public function orders()
+{
+    return $this->hasMany(Order::class, 'customer_id');
+}
+
+public function cart()
+{
+    return $this->hasOne(Cart::class, 'customer_id');
+}
+
+
+public function notifications()
+{
+    return $this->hasMany(Notification::class);
+}
 
     /**
      * The attributes that should be hidden for serialization.
