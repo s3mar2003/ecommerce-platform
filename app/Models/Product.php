@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
 {
@@ -19,7 +20,18 @@ class Product extends Model
         'image_url',
         'status',
     ];
-
+   public function getImageUrlAttribute($value)
+{
+    if (!$value) {
+        return null;
+    }
+    
+    if (strpos($value, 'http') === 0) {
+        return $value;
+    }
+    
+    return asset('storage/' . $value);
+}
     public function vendor()
     {
         return $this->belongsTo(User::class, 'vendor_id');
