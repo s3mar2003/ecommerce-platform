@@ -1,3 +1,105 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* أنماط مخصصة للوضع الداكن */
+.dark {
+    color-scheme: dark;
+}
+
+.dark body {
+    @apply bg-gray-900 text-white;
+}
+
+.toast-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.toast-enter-active {
+  animation: toast-in 0.3s ease-out;
+}
+
+.toast-leave-active {
+  animation: toast-out 0.3s ease-in;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -60%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+@keyframes toast-out {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -60%);
+  }
+}
+
+
+/* تحسينات الأزرار */
+.btn-primary {
+    @apply bg-primary-600 hover:bg-primary-700 text-white transition-colors duration-200 dark:bg-primary-700 dark:hover:bg-primary-600;
+}
+
+.btn-secondary {
+    @apply bg-gray-600 hover:bg-gray-700 text-white transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-600;
+}
+
+/* تحسينات البطاقات */
+.card {
+    @apply bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700;
+}
+
+/* تحسينات الجداول */
+.table th {
+    @apply dark:bg-gray-700 dark:text-gray-300;
+}
+
+.table td {
+    @apply dark:bg-gray-800 dark:text-gray-200;
+}
+
+/* تحسينات النماذج */
+.form-input {
+    @apply dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500;
+}
+
+.form-label {
+    @apply dark:text-gray-300;
+}
+
+/* تحسينات للعربية */
+[dir="rtl"] {
+    direction: rtl;
+    text-align: right;
+}
+
+/* تحسينات للشاشات الصغيرة */
+@media (max-width: 640px) {
+    .mobile-hidden {
+        display: none;
+    }
+    
+    .mobile-full {
+        width: 100%;
+    }
+    
+    .custom-toast {
+        @apply top-2 right-2 left-2 w-auto;
+    }
+}
