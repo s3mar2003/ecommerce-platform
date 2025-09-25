@@ -144,6 +144,17 @@ const form = useForm({
 });
 
 const submit = () => {
-  form.put(route('admin.products.update', props.product.id));
+  form.put(route('admin.products.update', props.product.id), {
+    onSuccess: () => {
+      if (window.toast) {
+        window.toast.success('تم تحديث المنتج بنجاح');
+      }
+    },
+    onError: () => {
+      if (window.toast) {
+        window.toast.error('حدث خطأ أثناء التحديث');
+      }
+    }
+  });
 };
 </script>

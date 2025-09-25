@@ -1,5 +1,18 @@
+<!-- resources/js/Layouts/CustomerLayout.vue -->
 <template>
   <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <!-- منطقة الإشعارات -->
+    <div class="fixed top-4 right-4 z-50 space-y-2">
+      <Toast
+        v-for="toast in toasts"
+        :key="toast.id"
+        :message="toast.message"
+        :type="toast.type"
+        :duration="toast.duration"
+        @close="removeToast(toast.id)"
+      />
+    </div>
+
     <!-- شريط التنقل -->
     <nav class="bg-white dark:bg-gray-800 shadow-sm">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -125,14 +138,14 @@
     </nav>
 
     <!-- المحتوى الرئيسي -->
-    <main>
+    <main class="pb-16">
       <slot />
     </main>
 
     <!-- تذييل الصفحة -->
-    <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-12">
-      <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <div class="text-center text-gray-600 dark:text-gray-400">
+    <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 fixed bottom-0 w-full">
+      <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+        <div class="text-center text-gray-600 dark:text-gray-400 text-sm">
           <p>© 2024 متجرك. جميع الحقوق محفوظة.</p>
         </div>
       </div>
@@ -142,9 +155,21 @@
 
 <script setup>
 import { Link, router } from '@inertiajs/vue3';
-import { ref, onMounted, onUnmounted } from 'vue'; // إزالة computed
+import { ref, onMounted, onUnmounted, provide } from 'vue';
+import Toast from '@/Components/Toast.vue';
 
 const profileMenuOpen = ref(false);
+const toasts = ref([]);
+let toastId = 0;
+
+// توفير دالة إضافة الإشعارات للمكونات الفرعية
+const addToast = (message, type = 'info', duration = 5000) => {
+  const id = toastId++;
+  toasts.value.push({ id, message, type, duration });
+};
+
+// جعل الدالة متاحة للمكونات الفرعية
+provide('addToast', addToast);
 
 // إغلاق قائمة الملف الشخصي عند النقر خارجها
 const closeProfileMenu = (event) => {
@@ -155,6 +180,11 @@ const closeProfileMenu = (event) => {
 
 const toggleProfileMenu = () => {
   profileMenuOpen.value = !profileMenuOpen.value;
+};
+
+// إزالة الإشعار
+const removeToast = (id) => {
+  toasts.value = toasts.value.filter(toast => toast.id !== id);
 };
 
 // تسجيل الخروج
@@ -171,7 +201,3 @@ onUnmounted(() => {
   document.removeEventListener('click', closeProfileMenu);
 });
 </script>
-
-<style scoped>
-/* إضافة أي styles إضافية هنا إذا لزم الأمر */
-</style>

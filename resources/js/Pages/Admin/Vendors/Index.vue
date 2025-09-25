@@ -116,15 +116,16 @@
                     </Link>
                     
                     <button 
-  @click="deleteVendor(vendor)" 
-  class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 transition-colors"
-  title="حذف"
-  :disabled="vendor.products_count > 0"
->
-  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-  </svg>
-</button>
+                      @click="deleteVendor(vendor)" 
+                      class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                      :class="{'opacity-50 cursor-not-allowed': vendor.products_count > 0}"
+                      :title="vendor.products_count > 0 ? 'لا يمكن حذف البائع لأنه لديه منتجات' : 'حذف البائع'"
+                      :disabled="vendor.products_count > 0"
+                    >
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                      </svg>
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -135,7 +136,7 @@
         <!-- حالة عدم وجود بائعين -->
         <div v-if="vendors.data.length === 0" class="text-center py-12">
           <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
           </svg>
           <p class="text-gray-500 dark:text-gray-400 text-lg">لا يوجد بائعين</p>
           <p class="text-gray-400 dark:text-gray-500 text-sm mt-1">ابدأ بإضافة أول بائع إلى المنصة</p>
@@ -163,7 +164,7 @@ const props = defineProps({
 const search = ref(props.filters.search || '');
 const statusFilter = ref(props.filters.status || '');
 
-// البحث بانتظار الكتابة - إصلاح الدالة
+// البحث بانتظار الكتابة
 const debouncedSearch = debounce(() => {
   router.get(route('admin.vendors'), {
     search: search.value,
@@ -192,6 +193,26 @@ watch(search, () => {
   debouncedSearch();
 });
 
+// دالة حذف البائع
+const deleteVendor = (vendor) => {
+  if (vendor.products_count > 0) {
+    window.toast.error(`لا يمكن حذف البائع "${vendor.name}" لأنه لديه ${vendor.products_count} منتج/منتجات`);
+    return;
+  }
+
+  if (confirm(`هل أنت متأكد من حذف البائع "${vendor.name}"؟`)) {
+    router.delete(route('admin.vendors.delete', vendor.id), {
+      preserveScroll: true,
+      onSuccess: () => {
+        window.toast.success('تم حذف البائع بنجاح');
+      },
+      onError: (error) => {
+        window.toast.error(error.message || 'حدث خطأ أثناء الحذف');
+      }
+    });
+  }
+};
+
 // إعادة تعيين البحث
 const resetSearch = () => {
   search.value = '';
@@ -202,21 +223,16 @@ const resetSearch = () => {
     preserveScroll: true
   });
 };
-const deleteVendor = (vendor) => {
-  if (confirm(`هل أنت متأكد من حذف البائع "${vendor.name}"؟`)) {
-    router.delete(route('admin.vendors.delete', vendor.id), {
-      preserveScroll: true,
-      onSuccess: () => {
-        showToast('تم حذف البائع بنجاح', 'success');
-      },
-      onError: () => {
-        showToast('حدث خطأ أثناء الحذف', 'error');
-      }
-    });
-  }
-};
 </script>
 
 <style scoped>
+/* إضافة تأثيرات للزر المعطل */
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
 
+button:disabled:hover {
+  transform: none;
+}
 </style>
