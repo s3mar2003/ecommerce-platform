@@ -16,13 +16,13 @@ use Illuminate\Support\Facades\Log;
 
 class CustomerController extends Controller
 {
-    public function dashboard()
+     public function dashboard()
     {
         $user = Auth::user();
         
         $stats = [
             'orders_count' => $user->orders()->count(),
-            'cart_items' => $user->cart ? $user->cart->cartItems()->count() : 0,
+            'cart_items'=> $user->cart ? $user->cart->cartItems()->count() : 0,
             'pending_orders' => $user->orders()->where('order_status', 'pending')->count(),
             'completed_orders' => $user->orders()->where('order_status', 'delivered')->count(),
             'total_spent' => $user->orders()->where('payment_status', 'paid')->sum('total_amount'),
@@ -95,52 +95,59 @@ class CustomerController extends Controller
     }
 
   public function addToCart(Request $request)
-    {
-        $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1'
-        ]);
+{
+    $request->validate([
+        'product_id' => 'required|exists:products,id',
+        'quantity' => 'required|integer|min:1'
+    ]);
+    
 
-        try {
-            $user = Auth::user();
-            
-            $cart = $user->cart()->firstOrCreate(['customer_id' => $user->id]);
+    try {
+        $user = Auth::user();
+        $cart = Cart::firstOrCreate(['customer_id' => $user->id]);
+        
 
-            $product = Product::where('status', 'active')->find($request->product_id);
+        $product = Product::where('status', 'active')->find($request->product_id);
+
+        if (!$product) {
+            return redirect()->back()->with('error', 'المنتج غير متوفر حالياً');
+        }
+
+        // البحث عن العنصر في السلة
+        $cartItem = CartItem::where('cart_id', $cart->id)
+                           ->where('product_id', $request->product_id)
+                           ->first();
+
+        if ($cartItem) {
+            // إذا العنصر موجود، نزيد الكمية
+            $newQuantity = $cartItem->quantity + $request->quantity;
             
-            if (!$product) {
-                return redirect()->back()->with('error', 'المنتج غير متوفر حالياً');
+            if ($product->stock < $newQuantity) {
+                return redirect()->back()->with('error', 'الكمية الإجمالية تتجاوز المخزون المتاح. المتاح: ' . $product->stock);
             }
-
+            
+            $cartItem->update(['quantity' => $newQuantity]);
+        } else {
+            // إذا العنصر غير موجود، نتحقق من الكمية أولاً
             if ($product->stock < $request->quantity) {
                 return redirect()->back()->with('error', 'الكمية المطلوبة غير متوفرة. المتاح: ' . $product->stock);
             }
-
-            $cartItem = $cart->cartItems()->where('product_id', $request->product_id)->first();
-
-            if ($cartItem) {
-                $newQuantity = $cartItem->quantity + $request->quantity;
-                if ($product->stock < $newQuantity) {
-                    return redirect()->back()->with('error', 'الكمية الإجمالية تتجاوز المخزون المتاح');
-                }
-                $cartItem->update(['quantity' => $newQuantity]);
-            } else {
-                $cart->cartItems()->create([
-                    'product_id' => $request->product_id,
-                    'quantity' => $request->quantity
-                ]);
-            }
-
-            return redirect()->back()->with('success', 'تمت إضافة المنتج إلى السلة بنجاح');
-
-        } catch (\Exception $e) {
-            // استخدام error_log كبديل بسيط
-            error_log('Add to cart error: ' . $e->getMessage());
             
-            return redirect()->back()->with('error', 'حدث خطأ: ' . $e->getMessage());
+            // إنشاء عنصر جديد
+            $cartItem = CartItem::create([
+                'cart_id' => $cart->id,
+                'product_id' => $request->product_id,
+                'quantity' => $request->quantity
+            ]);
         }
-    }
 
+        return redirect()->back()->with('success', 'تمت إضافة المنتج إلى السلة بنجاح');
+
+    } catch (\Exception $e) {
+        error_log('Add to cart error: ' . $e->getMessage());
+        return redirect()->back()->with('error', 'حدث خطأ: ' . $e->getMessage());
+    }
+}
     public function cart()
     {
         $user = Auth::user();
@@ -337,17 +344,26 @@ class CustomerController extends Controller
     }
 
     public function showOrder(Order $order)
-    {
-        if ($order->customer_id !== Auth::id()) {
-            abort(403);
-        }
-
-        $order->load(['orderItems.product.vendor', 'payment']);
-
-        return Inertia::render('Customer/Orders/Show', [
-            'order' => $order
-        ]);
+{
+    if ($order->customer_id !== Auth::id()) {
+        abort(403);
     }
+
+    $order->load([
+        'customer', // تأكد من تحميل العلاقة
+        'orderItems.product.vendor', 
+        'payment'
+    ]);
+
+    // التحقق من وجود customer
+    if (!$order->customer) {
+        abort(404, 'العميل غير موجود');
+    }
+
+    return Inertia::render('Customer/Orders/Show', [
+        'order' => $order
+    ]);
+}
 
     public function cancelOrder(Request $request, Order $order)
     {
