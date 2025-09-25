@@ -2,91 +2,109 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-/* أنماط مخصصة للوضع الداكن */
+/* اتجاه النص للعربية مع بداية من اليسار */
+[dir="ltr"] {
+    direction: ltr;
+    text-align: left;
+}
+
+/* تحسينات خاصة للغة العربية مع LTR */
+.arabic-ltr {
+    font-family: 'Figtree', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.8;
+    letter-spacing: 0;
+}
+
+/* تحسين محاذاة النص العربي مع LTR */
+.text-right {
+    text-align: right;
+}
+
+.text-left {
+    text-align: left;
+}
+
+/* أنماط مخصصة */
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* تحسينات للوضع الداكن */
 .dark {
     color-scheme: dark;
 }
 
-.dark body {
-    @apply bg-gray-900 text-white;
-}
-
-.toast-container {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 9999;
-  pointer-events: none;
-}
-
-.toast-enter-active {
-  animation: toast-in 0.3s ease-out;
-}
-
-.toast-leave-active {
-  animation: toast-out 0.3s ease-in;
-}
-
-@keyframes toast-in {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -60%);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, -50%);
-  }
-}
-
-@keyframes toast-out {
-  from {
-    opacity: 1;
-    transform: translate(-50%, -50%);
-  }
-  to {
-    opacity: 0;
-    transform: translate(-50%, -60%);
-  }
-}
-
-
-/* تحسينات الأزرار */
+/* تحسينات للأزرار */
 .btn-primary {
-    @apply bg-primary-600 hover:bg-primary-700 text-white transition-colors duration-200 dark:bg-primary-700 dark:hover:bg-primary-600;
+    @apply bg-primary-600 hover:bg-primary-700 text-white transition-colors duration-200;
 }
 
 .btn-secondary {
-    @apply bg-gray-600 hover:bg-gray-700 text-white transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-600;
-}
+    @apply bg-gray-600 hover:bg-gray-700 text-white transition-colors duration-200;
+} 
 
-/* تحسينات البطاقات */
+/* تحسينات للبطاقات */
 .card {
     @apply bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700;
 }
 
-/* تحسينات الجداول */
+.card-header {
+    @apply px-6 py-4 border-b border-gray-200 dark:border-gray-700;
+}
+
+.card-body {
+    @apply p-6;
+}
+
+/* تحسينات للجداول - تعديل المحاذاة للعربية مع LTR */
+.table {
+    @apply w-full divide-y divide-gray-200 dark:divide-gray-700;
+}
+
 .table th {
-    @apply dark:bg-gray-700 dark:text-gray-300;
+    @apply px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider;
 }
 
 .table td {
-    @apply dark:bg-gray-800 dark:text-gray-200;
+    @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white;
+    text-align: right; /* محاذاة النص العربي لليمين */
 }
 
-/* تحسينات النماذج */
+/* تحسينات للنماذج */
 .form-input {
-    @apply dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500;
+    @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white;
+    text-align: right; /* محاذاة النص العربي لليمين */
 }
 
 .form-label {
-    @apply dark:text-gray-300;
+    @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1;
+    text-align: right; /* محاذاة التسميات لليمين */
 }
 
-/* تحسينات للعربية */
-[dir="rtl"] {
-    direction: rtl;
-    text-align: right;
+/* أنيميشن مخصصة */
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fade-in-up 0.5s ease-out;
 }
 
 /* تحسينات للشاشات الصغيرة */
@@ -98,8 +116,109 @@
     .mobile-full {
         width: 100%;
     }
-    
-    .custom-toast {
-        @apply top-2 right-2 left-2 w-auto;
-    }
+}
+
+/* فئات مساعدة إضافية للعربية مع LTR */
+.arabic-text {
+    font-family: 'Figtree', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.8;
+}
+
+.rtl-text {
+    direction: rtl;
+    unicode-bidi: embed;
+}
+
+.ltr-layout {
+    direction: ltr;
+    text-align: left;
+}
+/* أنماط الـ Toast */
+/* أنماط الـ Toast المحسنة */
+#toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 400px;
+}
+
+/* دعم الوضع الداكن */
+.dark #toast-container .bg-green-50 {
+  background-color: #052e16;
+}
+
+.dark #toast-container .bg-red-50 {
+  background-color: #450a0a;
+}
+
+.dark #toast-container .bg-yellow-50 {
+  background-color: #422006;
+}
+
+.dark #toast-container .bg-blue-50 {
+  background-color: #082f49;
+}
+
+.dark #toast-container .text-green-800 {
+  color: #bbf7d0;
+}
+
+.dark #toast-container .text-red-800 {
+  color: #fca5a5;
+}
+
+.dark #toast-container .text-yellow-800 {
+  color: #fde68a;
+}
+
+.dark #toast-container .text-blue-800 {
+  color: #bae6fd;
+}
+
+/* أنيميشن مخصصة للـ toast */
+.toast-enter-active {
+  animation: toastSlideIn 0.3s ease-out;
+}
+
+.toast-leave-active {
+  animation: toastSlideOut 0.3s ease-in;
+}
+
+@keyframes toastSlideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toastSlideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+/* تحسينات للشاشات الصغيرة */
+@media (max-width: 640px) {
+  #toast-container {
+    right: 10px;
+    left: 10px;
+    max-width: none;
+  }
+  
+  #toast-container .max-w-md {
+    max-width: none;
+  }
 }

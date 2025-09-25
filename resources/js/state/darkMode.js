@@ -1,4 +1,3 @@
-// resources/js/state/darkMode.js
 const darkModeState = {
     isDark: false,
     
@@ -38,7 +37,6 @@ const darkModeState = {
     }
 };
 
-// تهيئة الوضع الداكن عند التحميل
 darkModeState.init();
 
 export default darkModeState;

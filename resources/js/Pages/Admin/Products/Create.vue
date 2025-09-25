@@ -145,14 +145,15 @@ const submit = () => {
   form.post(route('admin.products.store'), {
     onSuccess: () => {
       if (window.toast) {
-        window.toast.success('تم حفظ المنتج بنجاح');
+        window.toast.success('تم إنشاء المنتج بنجاح');
       }
     },
     onError: () => {
       if (window.toast) {
-        window.toast.error('حدث خطأ أثناء الحفظ');
+        window.toast.error('حدث خطأ أثناء إنشاء المنتج');
       }
     }
   });
 };
+
 </script>

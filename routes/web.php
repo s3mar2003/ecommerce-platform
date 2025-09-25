@@ -67,8 +67,9 @@ Route::middleware(['auth', 'role:vendor'])
         
         // مسارات الطلبات
          Route::get('/orders', [VendorController::class, 'orders'])->name('orders');
-        Route::get('/orders/{order}', [VendorController::class, 'showOrder'])->name('orders.show'); // هذا السطر المطلوب
+        Route::get('/orders/{order}', [VendorController::class, 'showOrder'])->name('orders.show');
         Route::put('/orders/{order}/status', [VendorController::class, 'updateOrderStatus'])->name('orders.updateStatus');
+         Route::post('/orders/{order}/cancel', [CustomerController::class, 'cancelOrder'])->name('orders.cancel');
 
       
 });

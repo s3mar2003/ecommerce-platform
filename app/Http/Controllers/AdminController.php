@@ -99,13 +99,33 @@ public function createVendor()
 public function storeVendor(Request $request)
 {
     $request->validate([
-        'name' => 'required|string|max:255',
+        'name' => 'required|string|max:255|min:5', // اسم رباعي (4 كلمات × 2.5 حرف متوسط)
         'email' => 'required|email|unique:users,email',
         'password' => 'required|string|confirmed|min:6',
-        'phone' => 'nullable|string|max:20',
-        'address' => 'nullable|string|max:255',
-        'status' => 'required|in:active,inactive' 
+        'phone' => 'required|string|min:8|max:20',
+        'address' => 'required|string|min:3|max:500'
+    ], [
+        'name.required' => 'حقل الاسم مطلوب',
+        'name.min' => 'الاسم يجب أن يكون رباعي ',
+        'email.required' => 'حقل البريد الإلكتروني مطلوب',
+        'email.email' => 'صيغة البريد الإلكتروني غير صحيحة',
+        'email.unique' => 'البريد الإلكتروني مسجل مسبقاً',
+        'password.required' => 'حقل كلمة المرور مطلوب',
+        'password.min' => 'كلمة المرور يجب أن تكون 6 أحرف على الأقل',
+        'password.confirmed' => 'كلمة المرور غير متطابقة',
+        'phone.required' => 'حقل الهاتف مطلوب',
+        'phone.min' => 'رقم الهاتف يجب أن يكون 8 أرقام على الأقل',
+        'address.required' => 'حقل العنوان مطلوب',
+        'address.min' => 'العنوان يجب أن يكون تفصيلياً '
     ]);
+
+    // تحقق إضافي للاسم الرباعي
+    $nameWords = count(explode(' ', trim($request->name)));
+    if ($nameWords < 3) {
+        return redirect()->back()->withErrors([
+            'name' => 'الاسم يجب أن يكون رباعي '
+        ]);
+    }
 
     User::create([
         'name' => $request->name,
@@ -114,11 +134,12 @@ public function storeVendor(Request $request)
         'role' => 'vendor',
         'phone' => $request->phone,
         'address' => $request->address,
-        'status' => $request->status 
+        'status' => 'active'
     ]);
 
     return redirect()->route('admin.vendors')->with('success', 'تم إنشاء البائع بنجاح');
 }
+
 
 public function editVendor(User $vendor)
 {
@@ -128,35 +149,52 @@ public function editVendor(User $vendor)
 public function updateVendor(Request $request, User $vendor)
 {
     $request->validate([
-        'name' => 'required|string|max:255',
+        'name' => 'required|string|max:255|min:3',
         'email' => 'required|email|unique:users,email,' . $vendor->id,
-        'phone' => 'nullable|string|max:20',
-        'address' => 'nullable|string|max:255',
-        'status' => 'required|in:active,inactive' 
+        'phone' => 'required|string|min:8|max:20',
+        'address' => 'required|string|min:3|max:500'
+    ], [
+        'name.required' => 'حقل الاسم مطلوب',
+        'name.min' => 'الاسم يجب أن يكون رباعي ',
+        'email.required' => 'حقل البريد الإلكتروني مطلوب',
+        'email.email' => 'صيغة البريد الإلكتروني غير صحيحة',
+        'email.unique' => 'البريد الإلكتروني مسجل مسبقاً',
+        'phone.required' => 'حقل الهاتف مطلوب',
+        'phone.min' => 'رقم الهاتف يجب أن يكون 8 أرقام على الأقل',
+        'address.required' => 'حقل العنوان مطلوب',
+        'address.min' => 'العنوان يجب أن يكون تفصيلياً'
     ]);
 
-    $vendor->update($request->only('name', 'email', 'phone', 'address', 'status'));
+    // تحقق إضافي للاسم الرباعي
+    $nameWords = count(explode(' ', trim($request->name)));
+    if ($nameWords < 3) {
+        return redirect()->back()->withErrors([
+            'name' => 'الاسم يجب أن يكون رباعي '
+        ]);
+    }
+
+    $vendor->update($request->only('name', 'email', 'phone', 'address'));
 
     return redirect()->route('admin.vendors')->with('success', 'تم تحديث البائع بنجاح');
 }
+ public function deleteVendor(User $vendor)
+    {
+        if ($vendor->role !== 'vendor') {
+            return redirect()->back()->with('error', 'المستخدم ليس بائعاً');
+        }
 
-public function deleteVendor(User $vendor)
-{
-    if ($vendor->role !== 'vendor') {
-        return redirect()->back()->with('error', 'المستخدم ليس بائعاً');
-    }
+        // التحقق من أن البائع ليس لديه منتجات
+        if ($vendor->products()->count() > 0) {
+            return redirect()->back()->with('error', 'لا يمكن حذف البائع لأنه لديه منتجات');
+        }
 
-    if ($vendor->products()->count() > 0) {
-        return redirect()->back()->with('error', 'لا يمكن حذف البائع لأنه لديه منتجات');
+        try {
+            $vendor->delete();
+            return redirect()->route('admin.vendors')->with('success', 'تم حذف البائع بنجاح');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'حدث خطأ أثناء حذف البائع: ' . $e->getMessage());
+        }
     }
-
-    try {
-        $vendor->delete();
-        return redirect()->route('admin.vendors')->with('success', 'تم حذف البائع بنجاح');
-    } catch (\Exception $e) {
-        return redirect()->back()->with('error', 'حدث خطأ أثناء حذف البائع: ' . $e->getMessage());
-    }
-}
 
 // public function toggleStatus(User $vendor)
 // {

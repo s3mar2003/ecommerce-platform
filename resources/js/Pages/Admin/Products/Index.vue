@@ -134,6 +134,7 @@ const filterProducts = () => {
   });
 };
 
+// في دالة deleteProduct
 const deleteProduct = (product) => {
   if (confirm(`هل أنت متأكد من حذف المنتج "${product.name}"؟`)) {
     router.delete(route('admin.products.delete', product.id), {
@@ -143,9 +144,9 @@ const deleteProduct = (product) => {
           window.toast.success('تم حذف المنتج بنجاح');
         }
       },
-      onError: () => {
+      onError: (error) => {
         if (window.toast) {
-          window.toast.error('حدث خطأ أثناء الحذف');
+          window.toast.error(error.message || 'حدث خطأ أثناء الحذف');
         }
       }
     });

@@ -178,4 +178,3 @@ const getStatusText = (status) => {
   return texts[status] || status;
 };
 </script>
-

@@ -1,5 +1,6 @@
+<!-- resources/js/Pages/Customer/Products/Show.vue -->
 <template>
-  <CustomerLayout :title="product.name">
+  <CustomerLayout>
     <Head :title="product.name" />
     
     <div class="py-6">
@@ -38,7 +39,7 @@
                 <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">{{ product.name }}</h1>
                 
                 <div class="flex items-center mb-4">
-                  <span class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{{ product.price }} ر.س</span>
+                  <span class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{{ formatCurrency(product.price) }}</span>
                   <span v-if="product.stock > 0" class="mr-4 text-sm text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-2 py-1 rounded">
                     متوفر
                   </span>
@@ -128,7 +129,7 @@
                     <h3 class="font-medium text-gray-900 dark:text-white mb-1">{{ relatedProduct.name }}</h3>
                     <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-2">{{ relatedProduct.description }}</p>
                     <div class="flex items-center justify-between">
-                      <span class="font-bold text-indigo-600 dark:text-indigo-400">{{ relatedProduct.price }} ر.س</span>
+                      <span class="font-bold text-indigo-600 dark:text-indigo-400">{{ formatCurrency(relatedProduct.price) }}</span>
                       <span class="text-xs" :class="relatedProduct.stock > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
                         {{ relatedProduct.stock > 0 ? 'متوفر' : 'غير متوفر' }}
                       </span>
@@ -146,8 +147,8 @@
 
 <script setup>
 import { Head, Link, router } from '@inertiajs/vue3';
+import { ref, inject } from 'vue';
 import CustomerLayout from '@/Layouts/CustomerLayout.vue';
-import { ref } from 'vue';
 
 const props = defineProps({
   product: Object,
@@ -155,6 +156,7 @@ const props = defineProps({
 });
 
 const quantity = ref(1);
+const addToast = inject('addToast');
 
 const incrementQuantity = () => {
   if (quantity.value < props.product.stock) {
@@ -168,6 +170,13 @@ const decrementQuantity = () => {
   }
 };
 
+const formatCurrency = (amount) => {
+  return new Intl.NumberFormat('ar-SA', {
+    style: 'currency',
+    currency: 'SAR'
+  }).format(amount);
+};
+
 const addToCart = () => {
   router.post(route('customer.cart.add'), {
     product_id: props.product.id,
@@ -176,23 +185,12 @@ const addToCart = () => {
     preserveScroll: true,
     onSuccess: () => {
       quantity.value = 1;
-      showToast(`تم إضافة "${props.product.name}" إلى السلة`, 'success');
+      addToast(`تم إضافة "${props.product.name}" إلى السلة`, 'success');
     },
     onError: (errors) => {
-      showToast(errors.message || 'حدث خطأ أثناء الإضافة', 'error');
+      addToast(errors.message || 'حدث خطأ أثناء الإضافة', 'error');
     }
   });
-};
-
-const showToast = (message, type = 'info') => {
-  const toast = document.createElement('div');
-  toast.className = `fixed top-4 right-4 p-4 rounded-lg text-white z-50 ${
-    type === 'success' ? 'bg-green-500' : 'bg-red-500'
-  }`;
-  toast.textContent = message;
-  document.body.appendChild(toast);
-  
-  setTimeout(() => toast.remove(), 3000);
 };
 </script>
 
